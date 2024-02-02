@@ -17,57 +17,52 @@ namespace PersonCrud.Controllers
         [HttpGet("GetAllPersons")]
         public IActionResult GetPersons()
         {
-            var person = _personService.GetPerson();
-            if (person.Count == 0)
-                return NotFound("No persons registred! Please register one");
+            var result = _personService.GetPerson();
+            if (!String.IsNullOrEmpty(result.Error))
+                return NotFound(result.Error);
 
-            return Ok(person);
+            return Ok(result.PersonModelList);
 
         }
         [HttpGet("GetPersonById")]
         public IActionResult GetPersons(int id)
         {
-            var person = _personService.GetPersonById(id);
-            if (person == null)
-                return NotFound("Person not found!");
+            var result = _personService.GetPersonById(id);
+            if (!String.IsNullOrEmpty(result.Error))
+                return NotFound(result.Error);
 
-            return Ok(person);
+            return Ok(result.PersonModelList);
 
         }
         [HttpPost("InsertPerson")]
         public IActionResult InsertPerson([FromBody] PersonWrapper personModel)
         {
-            bool person = _personService.InsertPersonToTable(personModel);
-            if (!person)
-                return NotFound("Something failed");
+            var result = _personService.InsertPersonToTable(personModel);
+            if (string.IsNullOrEmpty(result.Error))
+                return Ok(result.Success);
 
-            return Ok("Person inserted successfully!");
-            
-
+            return NotFound(result.Error);
         }
         [HttpPut("UpdatePerson")]
         public IActionResult UpdatePerson([FromBody] PersonModel personModel)
         {
-            var person = _personService.UpdatePersonToTable(personModel);
+            var result = _personService.UpdatePersonToTable(personModel);
 
-            if (!person)
-                return NotFound("No person found with that Id");
+            if (string.IsNullOrEmpty(result.Error))
+                return Ok(result.Success);
 
-            return Ok("Person updated successfully!");
+            return NotFound(result.Error);
 
         }
         [HttpDelete("DeletePersonById")]
         public IActionResult UpdatePerson(int id)
         {
-            bool person = _personService.DeletePersonById(id);
-            if (!person)
-            {
-                return NotFound("No person found with that Id");
-            }
-            else
-            {
-                return Ok("Person deleted successfully!");
-            }
+            var result = _personService.DeletePersonById(id);
+            if (string.IsNullOrEmpty(result.Error))
+                return Ok(result.Success);
+
+
+            return NotFound(result.Error);
         }
     }
 }
