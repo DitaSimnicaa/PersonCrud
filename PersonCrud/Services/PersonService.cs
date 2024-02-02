@@ -10,28 +10,41 @@ namespace PersonCrud.Services
         {
             _personInterface = personInterface;
         }
-        public List<PersonModel> GetPerson()
+        public ModelToReturn GetPerson()
         {
-            List<PersonModel> personModels = new List<PersonModel>();
+            ModelToReturn modelToReturn = new ModelToReturn();
 
             var personsFound = _personInterface.GetPersons();
-            foreach ( var person in personsFound )
+            if (personsFound.Count > 0)
             {
-                personModels.Add(person);
+                foreach (var person in personsFound)
+                {
+                    modelToReturn.PersonModelList.Add(person);
+                }
+            }
+            else
+            {
+                modelToReturn.Error = "No person found in database!";
             }
 
-            return personModels;
+            return modelToReturn;
 
         }
-        public PersonModel GetPersonById(int id)
+        public ModelToReturn GetPersonById(int id)
         {
-            PersonModel result = _personInterface.GetPersonById(id);
+            ModelToReturn modelToReturn = new ModelToReturn();
+            PersonModel personModel = _personInterface.GetPersonById(id);
+            if (personModel != null)
+                modelToReturn.PersonModelList.Add(personModel);
+            else
+                modelToReturn.Error = "No person found with that Id!";
             
-            return result;
+            return modelToReturn;
         }
 
-        public bool InsertPersonToTable(PersonWrapper personModel)
+        public ModelToReturn InsertPersonToTable(PersonWrapper personModel)
         {
+            ModelToReturn modelToRetrun = new ModelToReturn();
             PersonModel person = new PersonModel();
             if(personModel != null)
             {
@@ -41,27 +54,41 @@ namespace PersonCrud.Services
 
                 var result = _personInterface.InsertPerson(person);
                 if (result)
-                    return true;
-
-                return false;
+                    modelToRetrun.Success = "Person inserted successfully!";
+                else
+                    modelToRetrun.Error = "Something failed to insert the person!";                
             }
             else
             {
-                return false;
+                modelToRetrun.Error = "Person can't be null";
             }
+            return modelToRetrun;
         }
 
-        public bool UpdatePersonToTable(PersonModel personModel)
+        public ModelToReturn UpdatePersonToTable(PersonModel personModel)
         {
+            ModelToReturn modelToReturn = new ModelToReturn();
             var result = _personInterface.UpdatePerson(personModel);
+            if (result)
+                modelToReturn.Success = "Person updated successfully";
+            else
+                modelToReturn.Error = "Something failed to update the person!";
 
-            return result;
+            return modelToReturn;
         }
 
-        public bool DeletePersonById(int id)
-        {
+        public ModelToReturn DeletePersonById(int id)
+        {   
+            ModelToReturn modelToReturn = new ModelToReturn();
             var result = _personInterface.DeletePersonById(id);
-            return result ? true : false;
+
+            if (result)
+                modelToReturn.Success = "Person deleted successfully!";
+            else
+                modelToReturn.Error = "Something failed to update the person!";
+
+            return modelToReturn;
+
         }
     }
 }

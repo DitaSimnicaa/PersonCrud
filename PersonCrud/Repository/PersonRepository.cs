@@ -24,7 +24,7 @@ namespace PersonCrud.Repository
         }
 
         public bool InsertPerson(PersonModel person)
-        {            
+        {
             _context.Add(person);
             var saved = _context.SaveChanges();
             if(saved >  0)
@@ -42,8 +42,11 @@ namespace PersonCrud.Repository
                 personFound.FirstName = person.FirstName;
                 personFound.LastName = person.LastName;
                 personFound.Gender = person.Gender;
-                _context.SaveChanges();
-                return true;
+                var result = _context.SaveChanges();
+                if (result > 0)
+                    return true;
+                else
+                    return false;
             }
             else
             {
